@@ -1,13 +1,10 @@
 package br.com.controle.api.model;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.sun.istack.NotNull;
@@ -17,25 +14,19 @@ import com.sun.istack.NotNull;
 public class Cliente {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name="id_cliente",sequenceName="cliente_id_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "id_cliente")
 	private Long id;
 	
 	@NotNull
 	private String nome;
 
 	private int limite;
+	
+	private Long telefone;
 
-//	@ManyToOne
-//    @JoinColumn(name = "cliente_id")
-//	private List<Pedido> pedidos;
-	
-	
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getNome() {
@@ -45,10 +36,14 @@ public class Cliente {
 	public int getLimite() {
 		return limite;
 	}
-//
-//	public List<Pedido> getPedidos() {
-//		return pedidos;
-//	}
+
+	public Long getTelefone() {
+		return telefone;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public void setNome(String nome) {
 		this.nome = nome;
@@ -58,9 +53,14 @@ public class Cliente {
 		this.limite = limite;
 	}
 
-//	public void setPedidos(List<Pedido> pedidos) {
-//		this.pedidos = pedidos;
-//	}
+	public void setTelefone(Long telefone) {
+		this.telefone = telefone;
+	}
+
+	@Override
+	public String toString() {
+		return "Cliente [id=" + id + ", nome=" + nome + ", limite=" + limite + ", telefone=" + telefone + "]";
+	}
 
 	@Override
 	public int hashCode() {
@@ -69,7 +69,7 @@ public class Cliente {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + limite;
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
-//		result = prime * result + ((pedidos == null) ? 0 : pedidos.hashCode());
+		result = prime * result + ((telefone == null) ? 0 : telefone.hashCode());
 		return result;
 	}
 
@@ -94,18 +94,19 @@ public class Cliente {
 				return false;
 		} else if (!nome.equals(other.nome))
 			return false;
-//		if (pedidos == null) {
-//			if (other.pedidos != null)
-//				return false;
-//		} else if (!pedidos.equals(other.pedidos))
-//			return false;
+		if (telefone == null) {
+			if (other.telefone != null)
+				return false;
+		} else if (!telefone.equals(other.telefone))
+			return false;
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "Cliente [id=" + id + ", nome=" + nome + ", limite=" + limite + ", pedidos=" + "]";
-	}
+//	@ManyToOne
+//    @JoinColumn(name = "cliente_id")
+//	private List<Pedido> pedidos;
+	
+	
 	
 	
 	

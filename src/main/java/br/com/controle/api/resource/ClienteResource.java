@@ -65,6 +65,7 @@ public class ClienteResource {
 		return clienteRepository.findById(id).map(record -> {
 			record.setNome(cliente.getNome());
 			record.setLimite(cliente.getLimite());
+			record.setTelefone(cliente.getTelefone());
 //			record.setPedidos(cliente.getPedidos());
 
 			Cliente updated = clienteRepository.save(record);
