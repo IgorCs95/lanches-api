@@ -1,10 +1,15 @@
 package br.com.controle.api.model;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.sun.istack.NotNull;
 
 import br.com.controle.api.ennum.Categoria;
 
@@ -13,17 +18,21 @@ import br.com.controle.api.ennum.Categoria;
 public class Produto {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name="produto_seq",sequenceName="produto_id_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.IDENTITY,generator = "produto_seq")
 	private Long id;
-
+	
+	@NotNull
 	private String nome;
 
+	@NotNull
 	private float valor;
 
 	private Long estoque;
 	
 	private boolean status;
-
+	
+	@NotNull
 	private Categoria categoria;
 
 	public Long getId() {
