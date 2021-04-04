@@ -9,13 +9,17 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class ItemPedido_ {
 
 	public static volatile SingularAttribute<ItemPedido, Produto> produto;
+	public static volatile SingularAttribute<ItemPedido, Float> valorTotal;
 	public static volatile SingularAttribute<ItemPedido, Pedido> pedido;
 	public static volatile SingularAttribute<ItemPedido, Float> valor;
+	public static volatile SingularAttribute<ItemPedido, Long> id;
 	public static volatile SingularAttribute<ItemPedido, Float> quantidade;
 
 	public static final String PRODUTO = "produto";
+	public static final String VALOR_TOTAL = "valorTotal";
 	public static final String PEDIDO = "pedido";
 	public static final String VALOR = "valor";
+	public static final String ID = "id";
 	public static final String QUANTIDADE = "quantidade";
 
 }

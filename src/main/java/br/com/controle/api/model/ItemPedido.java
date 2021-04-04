@@ -3,31 +3,57 @@ package br.com.controle.api.model;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
+import org.springframework.lang.NonNull;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sun.istack.NotNull;
 
 @Entity
-@Table(name="item_pedido",schema = "public")
-public class ItemPedido implements Serializable{
-	
+@Table(name = "item_pedido", schema = "public")
+public class ItemPedido{
+
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@JsonBackReference(value = "pedido")
 	@ManyToOne
+	@JoinColumn(name = "pedido_id", referencedColumnName = "id")
 	private Pedido pedido;
 	
-	@Id
-	@OneToOne
+	@JsonBackReference(value = "produto")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "produto_id", referencedColumnName = "id")
 	private Produto produto;
-
-	@NotNull
-	private float valor;
-	private float quantidade;
 	
-	public ItemPedido() {
-		setValor(this.produto.getValor());
+	@NotNull
+	private Float valor, valorTotal;
+	
+	@NotNull
+	private Float quantidade;
+	
+	
+	public void calcular() {
+		System.out.println("//////////////////////////////////////////////////"+produto.getValor());
+		
+		if(this.valor==null||this.valor==0)
+			this.valor = produto.getValor();
+		setValorTotal(valor*quantidade);
+	}
+	
+	public Long getId() {
+		return id;
 	}
 
 	public Pedido getPedido() {
@@ -38,12 +64,20 @@ public class ItemPedido implements Serializable{
 		return produto;
 	}
 
-	public float getValor() {
+	public Float getValor() {
 		return valor;
 	}
 
-	public float getQuantidade() {
+	public Float getValorTotal() {
+		return valorTotal;
+	}
+
+	public Float getQuantidade() {
 		return quantidade;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public void setPedido(Pedido pedido) {
@@ -54,57 +88,18 @@ public class ItemPedido implements Serializable{
 		this.produto = produto;
 	}
 
-	public void setValor(float valor) {
+	public void setValor(Float valor) {
 		this.valor = valor;
 	}
 
-	public void setQuantidade(float quantidade) {
+	public void setValorTotal(Float valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
+	public void setQuantidade(Float quantidade) {
 		this.quantidade = quantidade;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((pedido == null) ? 0 : pedido.hashCode());
-		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
-		result = prime * result + Float.floatToIntBits(quantidade);
-		result = prime * result + Float.floatToIntBits(valor);
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ItemPedido other = (ItemPedido) obj;
-		if (pedido == null) {
-			if (other.pedido != null)
-				return false;
-		} else if (!pedido.equals(other.pedido))
-			return false;
-		if (produto == null) {
-			if (other.produto != null)
-				return false;
-		} else if (!produto.equals(other.produto))
-			return false;
-		if (Float.floatToIntBits(quantidade) != Float.floatToIntBits(other.quantidade))
-			return false;
-		if (Float.floatToIntBits(valor) != Float.floatToIntBits(other.valor))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "ItemPedido [pedido=" + pedido + ", produto=" + produto + ", valor=" + valor + ", quantidade="
-				+ quantidade + "]";
-	}
 	
 	
-
 }

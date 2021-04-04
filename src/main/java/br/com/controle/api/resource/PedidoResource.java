@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.controle.api.event.RecursoCriarEvent;
+import br.com.controle.api.model.ItemPedido;
 import br.com.controle.api.model.Pedido;
+import br.com.controle.api.repository.ItemPedidoRepository;
 import br.com.controle.api.repository.PedidoRepository;
 import br.com.controle.api.repository.filter.PedidoFilter;
 
@@ -30,6 +32,9 @@ public class PedidoResource {
 
 	@Autowired
 	private PedidoRepository pedidoRepository;
+	
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
@@ -44,6 +49,15 @@ public class PedidoResource {
 
 	@PostMapping
 	public ResponseEntity<?> create(@Validated @RequestBody Pedido pedido, HttpServletResponse response) {
+		
+		
+		for(ItemPedido i:pedido.getListaItemPedido()) {
+			i.calcular();
+		}
+		
+		pedido.calcular();
+		
+		
 		Pedido c = pedidoRepository.save(pedido);
 
 		publisher.publishEvent(new RecursoCriarEvent(this, response, c.getId()));
@@ -61,14 +75,41 @@ public class PedidoResource {
 
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<Pedido> update(@Validated @PathVariable long id, @RequestBody Pedido pedido) {
+		
+		
 
 		return pedidoRepository.findById(id).map(record -> {
 			record.setCliente(pedido.getCliente());
 			record.setCreateAt(pedido.getCreateAt());
-			record.setListaItemPedido(pedido.getListaItemPedido());
 			record.setPagamentoAt(pedido.getPagamentoAt());
 			record.setStatusPagamento(pedido.getStatusPagamento());
+			
+			List<ItemPedido> lista = record.getListaItemPedido();
+			
+			for (ItemPedido itemPedido : lista) {
+				itemPedidoRepository.deleteById(itemPedido.getId());
+			}
+			
+			record.setListaItemPedido(pedido.getListaItemPedido());
+			
+			for(ItemPedido i:pedido.getListaItemPedido()) {
+				i.calcular();
+			}
+			
+			record.calcular();
+			
+			Pedido updated = pedidoRepository.save(record);
+			return ResponseEntity.ok().body(updated);
+		}).orElseThrow(() -> new EmptyResultDataAccessException(1));
+	}
 
+	@PutMapping(value = "/{id}/add")
+	public ResponseEntity<Pedido> addItem(@Validated @PathVariable long id, @RequestBody ItemPedido item) {
+		System.out.println(item);
+		
+		
+		return pedidoRepository.findById(id).map(record -> {
+			record.getListaItemPedido().add(item);
 			Pedido updated = pedidoRepository.save(record);
 			return ResponseEntity.ok().body(updated);
 		}).orElseThrow(() -> new EmptyResultDataAccessException(1));

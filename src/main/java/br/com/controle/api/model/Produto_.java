@@ -2,6 +2,7 @@ package br.com.controle.api.model;
 
 import br.com.controle.api.ennum.Categoria;
 import javax.annotation.Generated;
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
@@ -9,6 +10,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Produto.class)
 public abstract class Produto_ {
 
+	public static volatile ListAttribute<Produto, ItemPedido> itensPedido;
 	public static volatile SingularAttribute<Produto, Long> estoque;
 	public static volatile SingularAttribute<Produto, Categoria> categoria;
 	public static volatile SingularAttribute<Produto, Float> valor;
@@ -16,6 +18,7 @@ public abstract class Produto_ {
 	public static volatile SingularAttribute<Produto, Long> id;
 	public static volatile SingularAttribute<Produto, Boolean> status;
 
+	public static final String ITENS_PEDIDO = "itensPedido";
 	public static final String ESTOQUE = "estoque";
 	public static final String CATEGORIA = "categoria";
 	public static final String VALOR = "valor";

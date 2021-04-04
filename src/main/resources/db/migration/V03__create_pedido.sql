@@ -5,6 +5,7 @@ CREATE TABLE pedido(
 	cliente_id INTEGER,
 	create_at DATE,
 	pagamento_at DATE,
+	valor_total DECIMAL(10,2),
 	status_pagamento  VARCHAR(50),
 	FOREIGN KEY (cliente_id) REFERENCES cliente(id)
 );

@@ -1,11 +1,13 @@
 package br.com.controle.api.model;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +19,9 @@ import javax.persistence.Table;
 
 import org.springframework.data.annotation.CreatedDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import br.com.controle.api.ennum.StatusPagamento;
 
 @Entity
@@ -27,23 +32,38 @@ public class Pedido {
 	@SequenceGenerator(name = "pedido_seq", sequenceName = "pedido_id_seq", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedido_seq")
 	private Long id;
-
-	@ManyToOne
-	@JoinColumn(name = "cliente_id")
+	
+	@JsonBackReference(value = "cliente")
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "cliente_id", referencedColumnName = "id")
 	private Cliente cliente;
 
 	@CreatedDate
+	@Column(name = "create_at")
 	private Date createAt;
 
+	@Column(name = "pagamento_at")
 	private Date pagamentoAt;
 
+	@Column(name = "status_pagamento")
 	private StatusPagamento statusPagamento;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JsonManagedReference(value = "pedido")
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "pedido_id")
 	private List<ItemPedido> listaItemPedido;
 
-	public float valorTotal() {
-		return 0;
+	private float valorTotal;
+	
+	public void calcular() {
+		Date dateProvisoria = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+		setCreateAt(dateProvisoria);
+		setPagamentoAt(dateProvisoria);
+		Float valorTotal = 0f;
+		for (ItemPedido itemPedido : listaItemPedido) {
+			valorTotal+=itemPedido.getValorTotal();
+		}
+		setValorTotal(valorTotal);
 	}
 
 	public Long getId() {
@@ -70,6 +90,10 @@ public class Pedido {
 		return listaItemPedido;
 	}
 
+	public float getValorTotal() {
+		return valorTotal;
+	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -94,62 +118,8 @@ public class Pedido {
 		this.listaItemPedido = listaItemPedido;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((cliente == null) ? 0 : cliente.hashCode());
-		result = prime * result + ((createAt == null) ? 0 : createAt.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((listaItemPedido == null) ? 0 : listaItemPedido.hashCode());
-		result = prime * result + ((pagamentoAt == null) ? 0 : pagamentoAt.hashCode());
-		result = prime * result + ((statusPagamento == null) ? 0 : statusPagamento.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Pedido other = (Pedido) obj;
-		if (cliente == null) {
-			if (other.cliente != null)
-				return false;
-		} else if (!cliente.equals(other.cliente))
-			return false;
-		if (createAt == null) {
-			if (other.createAt != null)
-				return false;
-		} else if (!createAt.equals(other.createAt))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (listaItemPedido == null) {
-			if (other.listaItemPedido != null)
-				return false;
-		} else if (!listaItemPedido.equals(other.listaItemPedido))
-			return false;
-		if (pagamentoAt == null) {
-			if (other.pagamentoAt != null)
-				return false;
-		} else if (!pagamentoAt.equals(other.pagamentoAt))
-			return false;
-		if (statusPagamento != other.statusPagamento)
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Pedido [id=" + id + ", cliente=" + cliente + ", createAt=" + createAt + ", pagamentoAt=" + pagamentoAt
-				+ ", statusPagamento=" + statusPagamento + ", listaItemPedido=" + listaItemPedido + "]";
+	public void setValorTotal(float valorTotal) {
+		this.valorTotal = valorTotal;
 	}
 
 }

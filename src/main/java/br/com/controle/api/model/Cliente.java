@@ -2,37 +2,45 @@ package br.com.controle.api.model;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.core.sym.Name;
 import com.sun.istack.NotNull;
 
 @Entity
-@Table(name = "cliente",schema = "public")
+@Table(name = "cliente", schema = "public")
 public class Cliente {
-	
+
 	@Id
-	@SequenceGenerator(name="cliente_seq",sequenceName="cliente_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "cliente_seq", sequenceName = "cliente_id_seq", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "cliente_seq")
 	private Long id;
-	
+
 	@NotNull
 	private String nome;
-	
+
 	@NotNull
 	private int limite;
-	
+
 	private Long telefone;
 	
-	@OneToMany
+	@JsonManagedReference(value = "cliente")
+	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "cliente_id")
-	private List<Pedido> listPedidos;
+	private List<Pedido> pedidos;
 
 	public Long getId() {
 		return id;
@@ -50,8 +58,8 @@ public class Cliente {
 		return telefone;
 	}
 
-	public List<Pedido> getListPedidos() {
-		return listPedidos;
+	public List<Pedido> getPedidos() {
+		return pedidos;
 	}
 
 	public void setId(Long id) {
@@ -70,8 +78,8 @@ public class Cliente {
 		this.telefone = telefone;
 	}
 
-	public void setListPedidos(List<Pedido> listPedidos) {
-		this.listPedidos = listPedidos;
+	public void setPedidos(List<Pedido> pedidos) {
+		this.pedidos = pedidos;
 	}
 
 	@Override
@@ -80,8 +88,8 @@ public class Cliente {
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + limite;
-		result = prime * result + ((listPedidos == null) ? 0 : listPedidos.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((pedidos == null) ? 0 : pedidos.hashCode());
 		result = prime * result + ((telefone == null) ? 0 : telefone.hashCode());
 		return result;
 	}
@@ -102,15 +110,15 @@ public class Cliente {
 			return false;
 		if (limite != other.limite)
 			return false;
-		if (listPedidos == null) {
-			if (other.listPedidos != null)
-				return false;
-		} else if (!listPedidos.equals(other.listPedidos))
-			return false;
 		if (nome == null) {
 			if (other.nome != null)
 				return false;
 		} else if (!nome.equals(other.nome))
+			return false;
+		if (pedidos == null) {
+			if (other.pedidos != null)
+				return false;
+		} else if (!pedidos.equals(other.pedidos))
 			return false;
 		if (telefone == null) {
 			if (other.telefone != null)
@@ -122,13 +130,8 @@ public class Cliente {
 
 	@Override
 	public String toString() {
-		return "Cliente [id=" + id + ", nome=" + nome + ", limite=" + limite + ", telefone=" + telefone
-				+ ", listPedidos=" + listPedidos + "]";
+		return "Cliente [id=" + id + ", nome=" + nome + ", limite=" + limite + ", telefone=" + telefone + ", pedidos="
+				+ pedidos + "]";
 	}
-
-	
-	
-	
-	
 
 }

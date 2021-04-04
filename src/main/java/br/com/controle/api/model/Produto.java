@@ -1,27 +1,33 @@
 package br.com.controle.api.model;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 
 import br.com.controle.api.ennum.Categoria;
 
 @Entity
-@Table(name="produto",schema = "public")
+@Table(name = "produto", schema = "public")
 public class Produto {
 
 	@Id
-	@SequenceGenerator(name="produto_seq",sequenceName="produto_id_seq", allocationSize=1)
-	@GeneratedValue(strategy = GenerationType.IDENTITY,generator = "produto_seq")
+	@SequenceGenerator(name = "produto_seq", sequenceName = "produto_id_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "produto_seq")
 	private Long id;
-	
+
 	@NotNull
 	private String nome;
 
@@ -29,11 +35,17 @@ public class Produto {
 	private float valor;
 
 	private Long estoque;
-	
+
 	private boolean status;
-	
+
 	@NotNull
 	private Categoria categoria;
+	
+//	@JsonManagedReference(value = "produto")
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "produto_id")
+	private List<ItemPedido> itensPedido;
 
 	public Long getId() {
 		return id;
@@ -49,6 +61,18 @@ public class Produto {
 
 	public Long getEstoque() {
 		return estoque;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public List<ItemPedido> getItensPedido() {
+		return itensPedido;
 	}
 
 	public void setId(Long id) {
@@ -67,21 +91,16 @@ public class Produto {
 		this.estoque = estoque;
 	}
 
-
-	public boolean isStatus() {
-		return status;
-	}
-
 	public void setStatus(boolean status) {
 		this.status = status;
 	}
 
-	public Categoria getCategoria() {
-		return categoria;
-	}
-
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
+	}
+
+	public void setItensPedido(List<ItemPedido> itensPedido) {
+		this.itensPedido = itensPedido;
 	}
 
 	@Override
@@ -91,6 +110,7 @@ public class Produto {
 		result = prime * result + ((categoria == null) ? 0 : categoria.hashCode());
 		result = prime * result + ((estoque == null) ? 0 : estoque.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((itensPedido == null) ? 0 : itensPedido.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		result = prime * result + (status ? 1231 : 1237);
 		result = prime * result + Float.floatToIntBits(valor);
@@ -118,6 +138,11 @@ public class Produto {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
+		if (itensPedido == null) {
+			if (other.itensPedido != null)
+				return false;
+		} else if (!itensPedido.equals(other.itensPedido))
+			return false;
 		if (nome == null) {
 			if (other.nome != null)
 				return false;
@@ -133,14 +158,7 @@ public class Produto {
 	@Override
 	public String toString() {
 		return "Produto [id=" + id + ", nome=" + nome + ", valor=" + valor + ", estoque=" + estoque + ", status="
-				+ status + ", categoria=" + categoria + "]";
+				+ status + ", categoria=" + categoria + ", itensPedido=" + itensPedido + "]";
 	}
-
-	
-	
-	
-	
-	
-	
 
 }
